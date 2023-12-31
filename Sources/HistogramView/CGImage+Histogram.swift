@@ -57,6 +57,34 @@ extension CGImage {
 
         return (histogramBinZero, histogramBinOne, histogramBinTwo)
     }
+    // create a single channel histogram
+    func singleHistogram() -> [UInt]? {
+        let format = vImage_CGImageFormat(
+            bitsPerComponent: 8,
+            bitsPerPixel: 32,
+            colorSpace: CGColorSpaceCreateDeviceRGB(),
+            bitmapInfo: CGBitmapInfo(rawValue: CGImageAlphaInfo.premultipliedLast.rawValue),
+            renderingIntent: .defaultIntent)!
+        
+        guard var sourceBuffer = try? vImage_Buffer(cgImage: self, format: format) else {
+            return nil
+        }
+        
+        defer {
+            sourceBuffer.free()
+        }
+        
+        var histogramBinZero  = [vImagePixelCount](repeating: 0, count: 256)
+        histogramBinZero.withUnsafeMutableBufferPointer { zeroPtr in
+            let error = vImageHistogramCalculation_Planar8(&sourceBuffer, zeroPtr.baseAddress!, vImage_Flags(kvImageNoFlags))
+            
+            guard error == kvImageNoError else {
+                fatalError("Error calculating histogram: \(error)")
+            }
+        }
+        //return the slide of histogram
+        return Array(histogramBinZero[0...254])
+    }
 
 }
 

@@ -17,37 +17,65 @@ public typealias HistogramImage = NSImage
 public struct HistogramView: View {
 
     /// The image from which the histogram will be calculated
-    public let image: CGImage
+    private let image: CGImage
 
     /// The opacity of each channel layer. Default is `1`
-    public let channelOpacity: CGFloat
+    private let channelOpacity: CGFloat
 
     /// The blend mode for the channel layers. Default is `.screen`
-    public let blendMode: BlendMode
+    private let blendMode: BlendMode
 
     /// The scale of each layer. Default is `1`
-    public let scale: CGFloat
+    private let scale: CGFloat
+    
+    private let orientation: UIDeviceOrientation
+    
+    private let multiChannel: Bool
+    
+    private let lineWidth: CGFloat = 1.0
 
-    public init(image: HistogramImage, channelOpacity: CGFloat = 1, blendMode: BlendMode = .screen, scale: CGFloat = 1) {
+    public init(image: HistogramImage, channelOpacity: CGFloat = 1, blendMode: BlendMode = .screen, scale: CGFloat = 1, orientation: UIDeviceOrientation, multiChannel: Bool) {
         self.image          = image.cgImage!
         self.channelOpacity = channelOpacity
         self.blendMode      = blendMode
         self.scale          = scale
+        self.orientation    = orientation
+        self.multiChannel   = multiChannel
     }
 
     public var body: some View {
-        if let data = image.histogram() {
-            ZStack {
-                Group {
-                    HistogramChannel(data: data.red, scale: scale).foregroundColor(.red)
-                    HistogramChannel(data: data.green, scale: scale).foregroundColor(.green)
-                    HistogramChannel(data: data.blue, scale: scale).foregroundColor(.blue)
+        if multiChannel{
+            if let data = image.histogram() {
+                ZStack {
+                    Group {
+                        HistogramChannel(data: data.red, scale: scale, orientation: orientation).foregroundColor(.red)                    .opacity(channelOpacity)
+                        HistogramChannel(data: data.red, scale: scale, orientation: orientation).stroke(.red, lineWidth: lineWidth)
+                        HistogramChannel(data: data.green, scale: scale,orientation: orientation).foregroundColor(.green)
+                            .opacity(channelOpacity)
+                        HistogramChannel(data: data.green, scale: scale,orientation: orientation).stroke(.green, lineWidth: lineWidth)
+                        HistogramChannel(data: data.blue, scale: scale,orientation: orientation).foregroundColor(.blue)
+                            .opacity(channelOpacity)
+                        HistogramChannel(data: data.blue, scale: scale,orientation: orientation).stroke(.blue,lineWidth: lineWidth)
+                    }
+                    .blendMode(blendMode)
                 }
-                .opacity(channelOpacity)
-                .blendMode(blendMode)
+                .id(image)
+                .drawingGroup()
             }
-            .id(image)
-            .drawingGroup()
+        }
+        else{
+            if let data = image.singleHistogram(){
+                ZStack{
+                    HistogramChannel(data: data, scale: scale, orientation: orientation)
+                        .foregroundColor(.white)
+                        .opacity(channelOpacity)
+                    HistogramChannel(data: data, scale: scale, orientation: orientation)
+                        .stroke(.white, lineWidth: lineWidth)
+                    
+                }
+                    .id(image)
+                    .drawingGroup()
+            }
         }
     }
 }
