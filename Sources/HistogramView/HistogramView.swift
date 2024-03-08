@@ -31,31 +31,31 @@ public struct HistogramView: View {
     private let orientation: UIDeviceOrientation
     
     private let multiChannel: Bool
-    
-    private let lineWidth: CGFloat = 1.0
+        
+    private var step:Int
 
-    public init(image: HistogramImage, channelOpacity: CGFloat = 1, blendMode: BlendMode = .screen, scale: CGFloat = 1, orientation: UIDeviceOrientation, multiChannel: Bool) {
+    public init(image: HistogramImage, channelOpacity: CGFloat = 1, blendMode: BlendMode = .screen, scale: CGFloat = 1, orientation: UIDeviceOrientation, multiChannel: Bool,step:Int) {
         self.image          = image.cgImage!
         self.channelOpacity = channelOpacity
         self.blendMode      = blendMode
         self.scale          = scale
         self.orientation    = orientation
         self.multiChannel   = multiChannel
+        self.step           = step
     }
 
     public var body: some View {
         if multiChannel{
-            if let data = image.histogram() {
+            if let data = image.histogram(step: step) {
                 ZStack {
                     Group {
                         HistogramChannel(data: data.red, scale: scale, orientation: orientation).foregroundColor(.red)                    .opacity(channelOpacity)
-                        HistogramChannel(data: data.red, scale: scale, orientation: orientation).stroke(.red, lineWidth: lineWidth)
+
                         HistogramChannel(data: data.green, scale: scale,orientation: orientation).foregroundColor(.green)
                             .opacity(channelOpacity)
-                        HistogramChannel(data: data.green, scale: scale,orientation: orientation).stroke(.green, lineWidth: lineWidth)
+
                         HistogramChannel(data: data.blue, scale: scale,orientation: orientation).foregroundColor(.blue)
                             .opacity(channelOpacity)
-                        HistogramChannel(data: data.blue, scale: scale,orientation: orientation).stroke(.blue,lineWidth: lineWidth)
                     }
                     .blendMode(blendMode)
                 }
@@ -63,13 +63,12 @@ public struct HistogramView: View {
             }
         }
         else{
-            if let data = image.singleHistogram(){
+            if let data = image.singleHistogram(step: step){
                 ZStack{
                     HistogramChannel(data: data, scale: scale, orientation: orientation)
                         .foregroundColor(.white)
                         .opacity(channelOpacity)
-                    HistogramChannel(data: data, scale: scale, orientation: orientation)
-                        .stroke(.white, lineWidth: lineWidth)
+
                     
                 }
                     .drawingGroup()

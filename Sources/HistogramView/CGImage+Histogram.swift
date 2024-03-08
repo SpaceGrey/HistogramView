@@ -12,7 +12,7 @@ extension CGImage {
 
     /// The function calculates the histogram for each channel completely separately from the others.
     /// - Returns: A tuple contain the three histograms for the corresponding channels. Each of the three histograms will be an array with 256 elements.
-    func histogram() -> (red: [UInt], green: [UInt], blue: [UInt])? {
+    func histogram(step:Int = 1) -> (red: [UInt], green: [UInt], blue: [UInt])? {
         let format = vImage_CGImageFormat(
             bitsPerComponent: 8,
             bitsPerPixel: 32,
@@ -54,11 +54,21 @@ extension CGImage {
                 }
             }
         }
-
+        for i in stride(from: 0, through: 255, by: step){
+            for j in 0..<step{
+                histogramBinZero[i/step] += histogramBinZero[i+j]
+                histogramBinOne[i/step] += histogramBinOne[i+j]
+                histogramBinTwo[i/step] += histogramBinTwo[i+j]
+            }
+        }
+        let num = 256/step - 1
+        histogramBinZero = Array(histogramBinZero[0...num])
+        histogramBinOne = Array(histogramBinOne[0...num])
+        histogramBinTwo = Array(histogramBinTwo[0...num])
         return (histogramBinZero, histogramBinOne, histogramBinTwo)
     }
     // create a single channel histogram
-    func singleHistogram() -> [UInt]? {
+    func singleHistogram(step:Int = 1) -> [UInt]? {
         let format = vImage_CGImageFormat(
             bitsPerComponent: 8,
             bitsPerPixel: 32,
@@ -83,7 +93,13 @@ extension CGImage {
             }
         }
         //return the slide of histogram
-        return Array(histogramBinZero[0...254])
+        for i in stride(from: 0, through: 255, by: step){
+            for j in 0..<step{
+                histogramBinZero[i/step] += histogramBinZero[i+j]
+            }
+        }
+        let num = 256/step - 1
+        return Array(histogramBinZero[0...num-1])
     }
 
 }
