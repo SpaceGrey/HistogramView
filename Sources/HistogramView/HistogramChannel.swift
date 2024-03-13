@@ -15,7 +15,7 @@ struct HistogramChannel: Shape {
     var points:[CGPoint]{
         return Array(data.enumerated().map { (index, element) in
             let y = 1 - (CGFloat(element) / CGFloat(maximum)) * scale
-            let x = CGFloat(index) / CGFloat(data.count)
+            let x = CGFloat(index) / CGFloat(data.count-1)
             let offset = 1/CGFloat(data.count)
             return [CGPoint(x: x-offset, y: y),CGPoint(x:x, y:y)]
         }.joined())
