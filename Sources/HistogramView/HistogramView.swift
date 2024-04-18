@@ -4,7 +4,6 @@ import Accelerate
 
 #if canImport(UIKit)
 import UIKit
-public typealias HistogramImage = UIImage
 #endif
 
 #if canImport(AppKit)
@@ -34,8 +33,8 @@ public struct HistogramView: View {
         
     private var step:Int
 
-    public init(image: HistogramImage, channelOpacity: CGFloat = 1, blendMode: BlendMode = .screen, scale: CGFloat = 1, orientation: UIDeviceOrientation, multiChannel: Bool,step:Int) {
-        self.image          = image.cgImage!
+    public init(image: CGImage, channelOpacity: CGFloat = 1, blendMode: BlendMode = .screen, scale: CGFloat = 1, orientation: UIDeviceOrientation, multiChannel: Bool,step:Int) {
+        self.image          = image
         self.channelOpacity = channelOpacity
         self.blendMode      = blendMode
         self.scale          = scale
