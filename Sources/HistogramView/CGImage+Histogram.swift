@@ -68,7 +68,7 @@ extension CGImage {
         return (histogramBinZero, histogramBinOne, histogramBinTwo)
     }
     // create a single channel histogram
-    func singleHistogram(step:Int = 1) -> [UInt]? {
+    public func singleHistogram(step:Int = 1) -> [UInt]? {
         let format = vImage_CGImageFormat(
             bitsPerComponent: 8,
             bitsPerPixel: 32,

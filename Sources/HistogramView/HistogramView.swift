@@ -76,5 +76,44 @@ public struct HistogramView: View {
     }
 }
 
+// A SwiftUI Image Histogram View (for RGB channels)
+public struct HistogramByArrayView: View {
+
+    /// The image from which the histogram will be calculated
+    private let array:[UInt]
+
+    /// The opacity of each channel layer. Default is `1`
+    private let channelOpacity: CGFloat
+
+    /// The blend mode for the channel layers. Default is `.screen`
+    private let blendMode: BlendMode
+
+    /// The scale of each layer. Default is `1`
+    private let scale: CGFloat
+    
+    private let orientation: UIDeviceOrientation
+    
+        
+    private var step:Int
+
+    public init(array:[UInt], channelOpacity: CGFloat = 1, blendMode: BlendMode = .screen, scale: CGFloat = 1, orientation: UIDeviceOrientation,step:Int) {
+        self.array = array
+        self.channelOpacity = channelOpacity
+        self.blendMode      = blendMode
+        self.scale          = scale
+        self.orientation    = orientation
+        self.step           = step
+    }
+
+    public var body: some View {
+        HistogramChannel(data: array, scale: scale, orientation: orientation)
+            .foregroundColor(.white)
+            .opacity(channelOpacity)
+            .drawingGroup()
+
+        
+    }
+}
+
 
 
